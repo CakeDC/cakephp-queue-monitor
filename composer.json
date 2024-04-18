@@ -1,0 +1,74 @@
+{
+    "name": "cakedc/queue-monitor",
+    "description": "CakeDC Queue Monitor plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "keywords": [
+        "cakephp",
+        "queue",
+        "queue monitoring",
+        "queue monitor"
+    ],
+    "homepage": "https://github.com/CakeDC/cakephp-queue-monitor",
+    "authors": [
+        {
+            "name": "CakeDC",
+            "homepage": "https://www.cakedc.com",
+            "role": "Author"
+        },
+        {
+            "name": "Others",
+            "homepage": "https://github.com/CakeDC/cakephp-queue-monitor/graphs/contributors"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/CakeDC/cakephp-queue-monitor/issues",
+        "source": "https://github.com/CakeDC/cakephp-queue-monitor"
+    },
+    "require": {
+        "php": ">=8.1",
+        "cakephp/cakephp": "^5.0.1",
+        "cakephp/queue": "^2.0",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.1.0",
+        "cakephp/migrations": "^4.0.0",
+        "cakephp/cakephp-codesniffer": "^5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "CakeDC\\QueueMonitor\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CakeDC\\QueueMonitor\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs --colors --parallel=16 -p src/ tests/",
+        "cs-fix": "phpcbf --colors --parallel=16 -p src/ tests/",
+        "phpstan": "tools/phpstan analyse",
+        "psalm": "tools/psalm --show-info=false",
+        "stan": [
+            "@phpstan",
+            "@psalm"
+        ],
+        "stan-tests": "phpstan.phar analyze -c tests/phpstan.neon",
+        "stan-baseline": "phpstan.phar --generate-baseline",
+        "stan-setup": "phive install",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-clover=clover.xml"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
