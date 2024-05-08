@@ -42,6 +42,23 @@ enum MessageEvent: string
     }
 
     /**
+     * Get Event enum from int value
+     */
+    public static function getEventFromInt(?int $eventInt): ?self
+    {
+        return match ($eventInt) {
+            1 => self::Seen,
+            2 => self::Invalid,
+            3 => self::Start,
+            4 => self::Exception,
+            5 => self::Success,
+            6 => self::Reject,
+            7 => self::Failure,
+            default => null,
+        };
+    }
+
+    /**
      * Get as options
      */
     public static function getOptions(): array
