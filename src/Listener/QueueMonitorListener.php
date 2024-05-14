@@ -159,6 +159,7 @@ final class QueueMonitorListener implements EventListenerInterface
         /** @var \CakeDC\QueueMonitor\Model\Entity\Log $queueMonitoringLog */
         $queueMonitoringLog = $this->QueueMonitoringLogs->newEmptyEntity();
 
+        $queueMonitoringLog->created = DateTime::now('UTC');
         $queueMonitoringLog->message_id = (string)$queueMessage->getMessageId();
         $queueMonitoringLog->message_timestamp = DateTime::createFromTimestamp(
             (int)$queueMessage->getTimestamp(),

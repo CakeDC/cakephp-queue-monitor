@@ -29,7 +29,6 @@ use CakeDC\QueueMonitor\Model\Status\MessageEvent;
  * @method \CakeDC\QueueMonitor\Model\Entity\Log[] patchEntities(iterable $entities, array $data, array $options = [])
  * @method \CakeDC\QueueMonitor\Model\Entity\Log|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
  * @method \CakeDC\QueueMonitor\Model\Entity\Log saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class LogsTable extends Table
 {
@@ -46,7 +45,6 @@ class LogsTable extends Table
         $this->setTable('queue_monitoring_logs');
         $this->setDisplayField('event');
         $this->setPrimaryKey('id');
-        $this->addBehavior('Timestamp');
     }
 
     /**
