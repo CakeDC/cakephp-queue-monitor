@@ -15,6 +15,7 @@ namespace CakeDC\QueueMonitor\Listener;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use Cake\I18n\FrozenTime;
+use Cake\Log\Log;
 use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Table;
@@ -174,7 +175,9 @@ final class QueueMonitorListener implements EventListenerInterface
             'properties' => $queueMessage->getProperties(),
         ]);
 
-        $this->QueueMonitoringLogs->saveOrFail($queueMonitoringLog);
+        if (!$this->QueueMonitoringLogs->save($queueMonitoringLog)) {
+            Log::warning(__('Unable to save queue monitoring log into database'));
+        }
     }
 
     /**
