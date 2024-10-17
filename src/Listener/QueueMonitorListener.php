@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 namespace CakeDC\QueueMonitor\Listener;
 
-use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use Cake\I18n\FrozenTime;
@@ -22,6 +21,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Table;
 use Cake\Queue\Job\Message;
 use Cake\Utility\Hash;
+use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Exception\QueueMonitorException;
 use CakeDC\QueueMonitor\Model\Status\MessageEvent;
 use CakeDC\QueueMonitor\Model\Table\LogsTable;
@@ -36,6 +36,7 @@ use Throwable;
  */
 final class QueueMonitorListener implements EventListenerInterface
 {
+    use DisableTrait;
     use LocatorAwareTrait;
     use LogTrait;
 
@@ -225,13 +226,5 @@ final class QueueMonitorListener implements EventListenerInterface
         }
 
         return $queueMessage;
-    }
-
-    /**
-     * Check if queue monitoring is disabled by configuration
-     */
-    private function isDisabled(): bool
-    {
-        return (bool)Configure::read('QueueMonitor.disabled', false);
     }
 }

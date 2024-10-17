@@ -18,6 +18,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Log\LogTrait;
+use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 use Exception;
 use Psr\Log\LogLevel;
@@ -27,6 +28,7 @@ use Psr\Log\LogLevel;
  */
 final class PurgeCommand extends Command
 {
+    use DisableTrait;
     use LogTrait;
 
     private const DEFAULT_PURGE_DAYS_OLD = 30;
@@ -62,6 +64,12 @@ final class PurgeCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        if ($this->isDisabled()) {
+            $this->log('Logs were not purged because Queue Monitor is disabled.');
+
+            return self::CODE_SUCCESS;
+        }
+
         $purgeToDate = $this->queueMonitoringService->getPurgeToDate(
             (int)Configure::read(
                 'QueueMonitor.purgeLogsOlderThanDays',
