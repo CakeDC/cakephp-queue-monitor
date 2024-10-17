@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 namespace CakeDC\QueueMonitor\Listener;
 
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use Cake\I18n\FrozenTime;
@@ -74,6 +75,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleException(EventInterface $event, ?Message $message, ?Throwable $exception = null): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $message = $this->validateQueueMessage($message);
 
@@ -104,6 +109,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleMessageEvent(EventInterface $event, ?Message $message): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $message = $this->validateQueueMessage($message);
 
@@ -123,6 +132,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleSeen(EventInterface $event, ?QueueMessage $queueMessage): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $queueMessage = $this->validateInteropQueueMessage($queueMessage);
             $messageBody = json_decode($queueMessage->getBody(), true);
@@ -212,5 +225,13 @@ final class QueueMonitorListener implements EventListenerInterface
         }
 
         return $queueMessage;
+    }
+
+    /**
+     * Check if queue monitoring is disabled by configuration
+     */
+    private function isDisabled(): bool
+    {
+        return (bool)Configure::read('QueueMonitor.disabled', false);
     }
 }
