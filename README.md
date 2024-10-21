@@ -52,8 +52,8 @@ Set up the QueueMonitor configuration in your `config/app_local.php`:
 ```php
 // ...
     'QueueMonitor' => [
-        // With this setting you can enable or disable the queue monitoring without
-        // restarting the workers, the queue monitoring is enabled by default
+        // With this setting you can enable or disable the queue monitoring, the queue
+        // monitoring is enabled by default
         'disable' => false,
 
         // mailer config, the default is `default` mailer, you can ommit
