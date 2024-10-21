@@ -65,7 +65,10 @@ final class PurgeCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io)
     {
         if ($this->isDisabled()) {
-            $this->log('Logs were not purged because Queue Monitor is disabled.');
+            $this->log(
+                'Logs were not purged because Queue Monitor is disabled.',
+                LogLevel::WARNING
+            );
 
             return self::CODE_SUCCESS;
         }

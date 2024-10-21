@@ -21,6 +21,7 @@ use Cake\Log\LogTrait;
 use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 use Exception;
+use Psr\Log\LogLevel;
 
 /**
  * QueueMonitoringNotify command.
@@ -64,7 +65,10 @@ final class NotifyCommand extends Command
     public function execute(Arguments $args, ConsoleIo $io)
     {
         if ($this->isDisabled()) {
-            $this->log('Notification were not sent because Queue Monitor is disabled.');
+            $this->log(
+                'Notification were not sent because Queue Monitor is disabled.',
+                LogLevel::WARNING
+            );
 
             return self::CODE_SUCCESS;
         }
