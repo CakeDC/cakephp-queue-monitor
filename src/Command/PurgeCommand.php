@@ -73,18 +73,20 @@ final class PurgeCommand extends Command
             return self::CODE_SUCCESS;
         }
 
+        $purgeLogsOlderThanDays = (int)Configure::read(
+            'QueueMonitor.purgeLogsOlderThanDays',
+            self::DEFAULT_PURGE_DAYS_OLD
+        );
+
         $purgeToDate = $this->queueMonitoringService->getPurgeToDate(
-            (int)Configure::read(
-                'QueueMonitor.purgeLogsOlderThanDays',
-                self::DEFAULT_PURGE_DAYS_OLD
-            )
+            $purgeLogsOlderThanDays
         );
         $this->log(
             "Purging queue logs older than {$purgeToDate->toDateTimeString()} UTC",
             LogLevel::INFO
         );
         try {
-            $rowCount = $this->queueMonitoringService->purgeLogs(self::DEFAULT_PURGE_DAYS_OLD);
+            $rowCount = $this->queueMonitoringService->purgeLogs($purgeLogsOlderThanDays);
             $this->log(
                 "Purged $rowCount queue messages older than {$purgeToDate->toDateTimeString()} UTC",
                 LogLevel::INFO
