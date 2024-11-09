@@ -47,7 +47,7 @@ final class NotifyCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue_monitor notify';
+        return 'queue-monitor notify';
     }
 
     /**

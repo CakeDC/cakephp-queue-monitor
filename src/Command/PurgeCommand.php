@@ -47,7 +47,7 @@ final class PurgeCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue_monitor purge';
+        return 'queue-monitor purge';
     }
 
     /**
