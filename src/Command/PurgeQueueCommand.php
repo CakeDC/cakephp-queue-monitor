@@ -22,8 +22,8 @@ use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Exception\QueueMonitorException;
 use CakeDC\QueueMonitor\Service\EnqueueClientService;
 use Psr\Log\LogLevel;
-use function Cake\I18n\__;
 use function Cake\Collection\collection;
+use function Cake\I18n\__;
 
 /**
  * Purge command.
@@ -78,7 +78,7 @@ final class PurgeQueueCommand extends Command
                 'short' => 'y',
                 'boolean' => true,
                 'default' => false,
-                'help' => __('Yes - skip confirmation prompt')
+                'help' => __('Yes - skip confirmation prompt'),
             ]);
     }
 
@@ -182,7 +182,7 @@ final class PurgeQueueCommand extends Command
                 $prompt,
                 [
                     __('yes'),
-                    __('no')
+                    __('no'),
                 ],
                 __('no')
             );

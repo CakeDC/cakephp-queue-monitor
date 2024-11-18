@@ -48,7 +48,7 @@ final class EnqueueClientService
         return implode('.', [
             $enqueueClientConfig->getPrefix(),
             $enqueueClientConfig->getApp(),
-            $enqueueClientConfig->getDefaultQueue()
+            $enqueueClientConfig->getDefaultQueue(),
         ]);
     }
 }
