@@ -22,6 +22,8 @@ use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Exception\QueueMonitorException;
 use CakeDC\QueueMonitor\Service\EnqueueClientService;
 use Psr\Log\LogLevel;
+use function Cake\I18n\__;
+use function Cake\Collection\collection;
 
 /**
  * Purge command.
@@ -66,6 +68,12 @@ final class PurgeQueueCommand extends Command
             ->addArgument('queue-config', [
                 'help' => __('Queue configuration key'),
             ])
+            ->addOption('all', [
+                'help' => __('All messages will be purged'),
+                'short' => 'a',
+                'boolean' => true,
+                'default' => false,
+            ])
             ->addOption('yes', [
                 'short' => 'y',
                 'boolean' => true,
@@ -87,44 +95,54 @@ final class PurgeQueueCommand extends Command
 
             return self::CODE_SUCCESS;
         }
-        $queueConfig = $args->getArgument('queue-config');
 
-        if (!$this->validateQueueConfig($queueConfig)) {
-            $io->error(__('Queue configuration key is invalid'));
-            $configuredQueues = $this->getConfiguredQueues();
-            if ($configuredQueues) {
-                $io->error(__('Valid configuration keys are: {0}', implode(', ', $configuredQueues)));
-            } else {
-                $io->error(__('There are no queue configurations'));
-            }
-            $this->displayHelp($this->getOptionParser(), $args, $io);
-
-            return self::CODE_ERROR;
-        }
-
-        if (!$args->getOption('yes')) {
-            $confirmation = $io->askChoice(
-                __('Are you sure you want to purge messages from specified queue?'),
-                [
-                    __('yes'),
-                    __('no')
-                ],
-                __('no')
+        if ($args->getOption('all')) {
+            $this->checkConfirmation(
+                __('Are you sure you want to purge messages from all queues?'),
+                $args,
+                $io
             );
 
-            if ($confirmation === __('no')) {
-                $io->abort(__('Aborting'));
+            collection($this->getConfiguredQueues())->each(function (string $queueConfig) use ($io): void {
+                try {
+                    $this->enqueueClientService->purgeQueue($queueConfig);
+                    $io->success(__('Queue `{0}` purged successfully', $queueConfig));
+                } catch (QueueMonitorException $e) {
+                    $io->error(__('Unable to purge queue `{0}`, reason: {1}', $queueConfig, $e->getMessage()));
+                }
+            });
+        } else {
+            $queueConfig = $args->getArgument('queue-config');
+
+            if (!$this->validateQueueConfig($queueConfig)) {
+                $io->error(__('Queue configuration key is invalid'));
+                $configuredQueues = $this->getConfiguredQueues();
+                if ($configuredQueues) {
+                    $io->error(__('Valid configuration keys are: {0}', implode(', ', $configuredQueues)));
+                } else {
+                    $io->error(__('There are no queue configurations'));
+                }
+                $this->displayHelp($this->getOptionParser(), $args, $io);
+
+                return self::CODE_ERROR;
             }
-        }
-        try {
-            $this->enqueueClientService->purgeQueue($queueConfig);
-            $io->success(__('Queue purged successfully'));
 
-            return self::CODE_SUCCESS;
-        } catch (QueueMonitorException $e) {
-            $io->error(__('Unable to purge queue, reason: {0}', $e->getMessage()));
+            $this->checkConfirmation(
+                __('Are you sure you want to purge messages from specified queue?'),
+                $args,
+                $io
+            );
 
-            return self::CODE_ERROR;
+            try {
+                $this->enqueueClientService->purgeQueue($queueConfig);
+                $io->success(__('Queue `{0}` purged successfully', $queueConfig));
+
+                return self::CODE_SUCCESS;
+            } catch (QueueMonitorException $e) {
+                $io->error(__('Unable to purge queue `{0}`, reason: {1}', $queueConfig, $e->getMessage()));
+
+                return self::CODE_ERROR;
+            }
         }
     }
 
@@ -152,5 +170,26 @@ final class PurgeQueueCommand extends Command
     private function getConfiguredQueues(): array
     {
         return array_keys(Configure::read('Queue', []));
+    }
+
+    /**
+     * Check confirmation
+     */
+    private function checkConfirmation(string $prompt, Arguments $args, ConsoleIo $io): void
+    {
+        if (!$args->getOption('yes')) {
+            $confirmation = $io->askChoice(
+                $prompt,
+                [
+                    __('yes'),
+                    __('no')
+                ],
+                __('no')
+            );
+
+            if ($confirmation === __('no')) {
+                $io->abort(__('Aborting'));
+            }
+        }
     }
 }
