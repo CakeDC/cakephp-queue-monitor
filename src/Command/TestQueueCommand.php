@@ -19,12 +19,15 @@ use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Mailer\MailerAwareTrait;
 use Cake\Validation\Validation;
+use CakeDC\QueueMonitor\Core\DisableTrait;
+use Psr\Log\LogLevel;
 
 /**
- * Test Enqueue Command
+ * Test Queue Command
  */
-final class TestEnqueueCommand extends Command
+final class TestQueueCommand extends Command
 {
+    use DisableTrait;
     use MailerAwareTrait;
 
     private const ARGUMENT_EMAIL = 'email';
@@ -34,7 +37,7 @@ final class TestEnqueueCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue-monitor test-enqueue';
+        return 'queue-monitor test-queue';
     }
 
     /**
@@ -63,6 +66,15 @@ final class TestEnqueueCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        if ($this->isDisabled()) {
+            $this->log(
+                'Test Enqueue was not performed because Queue Monitor is disabled.',
+                LogLevel::WARNING
+            );
+
+            return self::CODE_SUCCESS;
+        }
+
         $email = $args->getArgument(self::ARGUMENT_EMAIL);
         if (!Validation::email($email)) {
             $io->error(__('Invalid email'));
@@ -78,11 +90,11 @@ final class TestEnqueueCommand extends Command
                 $email,
                 $io
             ): void {
-                /** @var \CakeDC\QueueMonitor\Mailer\TestEnqueueMailer $mailer */
-                $mailer = $this->getMailer('QueueMonitor.TestEnqueue');
-                /** @uses \CakeDC\QueueMonitor\Mailer\TestEnqueueMailer::testEnqueue() */
+                /** @var \CakeDC\QueueMonitor\Mailer\TestQueueMailer $mailer */
+                $mailer = $this->getMailer('CakeDC/QueueMonitor.TestQueue');
+                /** @uses \CakeDC\QueueMonitor\Mailer\TestQueueMailer::testQueue() */
                 $mailer->push(
-                    action: $mailer::SEND_TEST_ENQUEUE,
+                    action: $mailer::SEND_TEST_QUEUE,
                     args: [
                         $email,
                         $queueConfigKey,
@@ -92,7 +104,7 @@ final class TestEnqueueCommand extends Command
                     ]
                 );
                 $io->info(__(
-                    'Enqueued test email `{0}` in queue `{1}`',
+                    'Queued test email `{0}` in queue `{1}`',
                     $email,
                     $queueConfigKey
                 ));

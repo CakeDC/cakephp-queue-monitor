@@ -26,7 +26,7 @@ use Psr\Log\LogLevel;
 /**
  * Purge command.
  */
-final class PurgeCommand extends Command
+final class PurgeLogsCommand extends Command
 {
     use DisableTrait;
     use LogTrait;
@@ -47,7 +47,7 @@ final class PurgeCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue-monitor purge';
+        return 'queue-monitor purge-logs';
     }
 
     /**

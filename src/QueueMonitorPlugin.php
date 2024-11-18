@@ -12,11 +12,12 @@ declare(strict_types=1);
  */
 namespace CakeDC\QueueMonitor;
 
-use Cake\Console\CommandCollection;
 use Cake\Core\BasePlugin;
 use Cake\Core\ContainerInterface;
 use CakeDC\QueueMonitor\Command\NotifyCommand;
-use CakeDC\QueueMonitor\Command\PurgeCommand;
+use CakeDC\QueueMonitor\Command\PurgeLogsCommand;
+use CakeDC\QueueMonitor\Command\PurgeQueueCommand;
+use CakeDC\QueueMonitor\Service\EnqueueClientService;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 
 /**
@@ -42,23 +43,20 @@ class QueueMonitorPlugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public function console(CommandCollection $commands): CommandCollection
-    {
-        return parent::console($commands)
-            ->add('queue_monitor purge', PurgeCommand::class)
-            ->add('queue_monitor notify', NotifyCommand::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function services(ContainerInterface $container): void
     {
         $container->add(QueueMonitoringService::class);
+        $container->addShared(EnqueueClientService::class);
+
         $container
-            ->add(PurgeCommand::class)
+            ->add(PurgeLogsCommand::class)
             ->addArguments([
                 QueueMonitoringService::class,
+            ]);
+        $container
+            ->add(PurgeQueueCommand::class)
+            ->addArguments([
+                EnqueueClientService::class,
             ]);
         $container
             ->add(NotifyCommand::class)

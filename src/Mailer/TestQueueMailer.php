@@ -18,25 +18,25 @@ use Cake\Mailer\Message;
 use Cake\Queue\Mailer\QueueTrait;
 
 /**
- * Test Enqueue Mailer
+ * Test Queue Mailer
  */
-class TestEnqueueMailer extends Mailer
+class TestQueueMailer extends Mailer
 {
     use QueueTrait;
 
-    public const SEND_TEST_ENQUEUE = 'testEnqueue';
+    public const SEND_TEST_QUEUE = 'testQueue';
 
     /**
      * Mailer's name.
      *
      * @var string
      */
-    public static $name = 'TestEnqueue';
+    public static $name = 'TestQueue';
 
     /**
      * Send test email
      */
-    public function testEnqueue(string $emailAddress, ?string $queueConfig = 'default'): void
+    public function testQueue(string $emailAddress, ?string $queueConfig = 'default'): void
     {
         $this
             ->setProfile(Configure::read('QueueMonitor.mailerConfig', 'default'))
