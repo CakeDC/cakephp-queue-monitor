@@ -65,6 +65,12 @@ final class PurgeQueueCommand extends Command
             ->setDescription(self::getDescription())
             ->addArgument('queue-config', [
                 'help' => __('Queue configuration key'),
+            ])
+            ->addOption('yes', [
+                'short' => 'y',
+                'boolean' => true,
+                'default' => false,
+                'help' => __('Yes - skip confirmation prompt')
             ]);
     }
 
@@ -91,10 +97,25 @@ final class PurgeQueueCommand extends Command
             } else {
                 $io->error(__('There are no queue configurations'));
             }
+            $this->displayHelp($this->getOptionParser(), $args, $io);
 
             return self::CODE_ERROR;
         }
 
+        if (!$args->getOption('yes')) {
+            $confirmation = $io->askChoice(
+                __('Are you sure you want to purge messages from specified queue?'),
+                [
+                    __('yes'),
+                    __('no')
+                ],
+                __('no')
+            );
+
+            if ($confirmation === __('no')) {
+                $io->abort(__('Aborting'));
+            }
+        }
         try {
             $this->enqueueClientService->purgeQueue($queueConfig);
             $io->success(__('Queue purged successfully'));
