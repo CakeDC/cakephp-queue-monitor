@@ -54,7 +54,7 @@ final class TestQueueCommand extends Command
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return parent::buildOptionParser($parser)
-            ->setDescription(__('Enqueue test email'))
+            ->setDescription(self::getDescription())
             ->addArgument($this::ARGUMENT_EMAIL, [
                 'help' => __('Email to send to'),
                 'required' => true,

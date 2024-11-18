@@ -53,10 +53,18 @@ final class PurgeLogsCommand extends Command
     /**
      * @inheritDoc
      */
+    public static function getDescription(): string
+    {
+        return __('Queue Monitoring log purger');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return parent::buildOptionParser($parser)
-            ->setDescription(__('Queue Monitoring log purger'));
+            ->setDescription(self::getDescription());
     }
 
     /**

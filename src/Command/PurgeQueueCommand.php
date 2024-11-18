@@ -51,10 +51,18 @@ final class PurgeQueueCommand extends Command
     /**
      * @inheritDoc
      */
+    public static function getDescription(): string
+    {
+        return __('Purge messages from specified queue');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return parent::buildOptionParser($parser)
-            ->setDescription(__('Queue purger'))
+            ->setDescription(self::getDescription())
             ->addArgument('queue-config', [
                 'help' => __('Queue configuration key'),
             ]);
