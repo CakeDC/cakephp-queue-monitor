@@ -45,6 +45,6 @@ class TestQueueMailer extends Mailer
             ->setEmailFormat(Message::MESSAGE_BOTH)
             ->viewBuilder()
                 ->disableAutoLayout()
-                ->setTemplate('QueueMonitor.test_enqueue');
+                ->setTemplate('CakeDC/QueueMonitor.test');
     }
 }
