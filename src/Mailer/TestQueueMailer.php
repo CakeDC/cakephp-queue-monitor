@@ -16,6 +16,7 @@ use Cake\Core\Configure;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\Message;
 use Cake\Queue\Mailer\QueueTrait;
+use function Cake\I18n\__;
 
 /**
  * Test Queue Mailer

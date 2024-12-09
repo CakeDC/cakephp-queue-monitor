@@ -96,7 +96,7 @@ final class PurgeQueueCommand extends Command
             return self::CODE_SUCCESS;
         }
 
-        if ($args->getOption('all')) {
+        if ($args->getOption('all') === true) {
             $this->checkConfirmation(
                 __('Are you sure you want to purge messages from all queues?'),
                 $args,
@@ -134,7 +134,7 @@ final class PurgeQueueCommand extends Command
             );
 
             try {
-                $this->enqueueClientService->purgeQueue($queueConfig);
+                $this->enqueueClientService->purgeQueue((string)$queueConfig);
                 $io->success(__('Queue `{0}` purged successfully', $queueConfig));
 
                 return self::CODE_SUCCESS;
@@ -151,7 +151,7 @@ final class PurgeQueueCommand extends Command
      */
     private function validateQueueConfig(?string $queueConfig): bool
     {
-        if (empty($queueConfig)) {
+        if (is_null($queueConfig) || !strlen($queueConfig)) {
             return false;
         }
 
@@ -177,7 +177,7 @@ final class PurgeQueueCommand extends Command
      */
     private function checkConfirmation(string $prompt, Arguments $args, ConsoleIo $io): void
     {
-        if (!$args->getOption('yes')) {
+        if ($args->getOption('yes') === false) {
             $confirmation = $io->askChoice(
                 $prompt,
                 [
