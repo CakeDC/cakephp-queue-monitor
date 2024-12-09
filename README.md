@@ -97,17 +97,43 @@ For each queue configuration add `listener` setting
 
 To set up notifications when there are long running or possible stuck jobs please use command
 ```shell
-bin/cake queue_monitor notify
+bin/cake queue-monitor notify
 ```
 
 This command will send notification emails to recipients specified in `QueueMonitor.notificationRecipients`. Best is
-to use it as a cronjob
+to use it as a cronjob.
 
-## Purge command
+## Test Enqueue command
+
+To quickly test if all queues are running correctly please run this command (replace `your-email@domain.com` with working
+email address:
+```shell
+bin/cake queue-monitor test-enqueue your-email@domain.com
+```
+
+This command will send the command through all configured queues.
+
+## Purge queues command
+To purge the content of a specified queue you can use the purge queue command:
+```shell
+bin/cake queue-monitor purge-queue your-queue-name
+
+```
+
+The above command will remove all pending queue jobs from the specified queue.
+
+To purge all queues you can use command:
+
+```shell
+bin/cake queue-monitor purge-queue --all
+
+```
+
+## Purge Logs command
 
 The logs table may grow overtime, to keep it slim you can use the purge command:
 ```shell
-bin/cake queue_monitor purge
+bin/cake queue-monitor purge-logs
 ```
 
 This command will purge logs older than value specified in `QueueMonitor.purgeLogsOlderThanDays`, the value is in

@@ -25,9 +25,9 @@ use Psr\Log\LogLevel;
 use function Cake\I18n\__;
 
 /**
- * Purge command.
+ * Purge Logs command.
  */
-final class PurgeCommand extends Command
+final class PurgeLogsCommand extends Command
 {
     use DisableTrait;
     use LogTrait;
@@ -48,7 +48,15 @@ final class PurgeCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue_monitor purge';
+        return 'queue-monitor purge-logs';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getDescription(): string
+    {
+        return __('Queue Monitoring log purger');
     }
 
     /**
@@ -57,7 +65,7 @@ final class PurgeCommand extends Command
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return parent::buildOptionParser($parser)
-            ->setDescription(__('Queue Monitoring log purger'));
+            ->setDescription(self::getDescription());
     }
 
     /**
@@ -73,6 +81,7 @@ final class PurgeCommand extends Command
 
             return self::CODE_SUCCESS;
         }
+
         $purgeLogsOlderThanDays = (int)Configure::read(
             'QueueMonitor.purgeLogsOlderThanDays',
             self::DEFAULT_PURGE_DAYS_OLD
