@@ -15,17 +15,20 @@ namespace CakeDC\QueueMonitor\Listener;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
 use Cake\I18n\DateTime;
+use Cake\Log\Log;
 use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Table;
 use Cake\Queue\Job\Message;
 use Cake\Utility\Hash;
+use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Exception\QueueMonitorException;
 use CakeDC\QueueMonitor\Model\Status\MessageEvent;
 use CakeDC\QueueMonitor\Model\Table\LogsTable;
 use Exception;
 use Interop\Queue\Message as QueueMessage;
 use Throwable;
+use function Cake\I18n\__;
 
 /**
  * QueueMonitorListener
@@ -34,6 +37,7 @@ use Throwable;
  */
 final class QueueMonitorListener implements EventListenerInterface
 {
+    use DisableTrait;
     use LocatorAwareTrait;
     use LogTrait;
 
@@ -73,6 +77,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleException(EventInterface $event, ?Message $message, ?Throwable $exception = null): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $message = $this->validateQueueMessage($message);
 
@@ -103,6 +111,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleMessageEvent(EventInterface $event, ?Message $message): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $message = $this->validateQueueMessage($message);
 
@@ -122,6 +134,10 @@ final class QueueMonitorListener implements EventListenerInterface
      */
     public function handleSeen(EventInterface $event, ?QueueMessage $queueMessage): void
     {
+        if ($this->isDisabled()) {
+            return;
+        }
+
         try {
             $queueMessage = $this->validateInteropQueueMessage($queueMessage);
             $messageBody = json_decode($queueMessage->getBody(), true);
@@ -174,7 +190,9 @@ final class QueueMonitorListener implements EventListenerInterface
             'properties' => $queueMessage->getProperties(),
         ]);
 
-        $this->QueueMonitoringLogs->saveOrFail($queueMonitoringLog);
+        if (!$this->QueueMonitoringLogs->save($queueMonitoringLog)) {
+            Log::warning(__('Unable to save queue monitoring log into database'));
+        }
     }
 
     /**

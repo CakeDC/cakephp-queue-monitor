@@ -18,8 +18,10 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Log\LogTrait;
+use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 use Exception;
+use Psr\Log\LogLevel;
 use function Cake\I18n\__;
 
 /**
@@ -27,6 +29,7 @@ use function Cake\I18n\__;
  */
 final class NotifyCommand extends Command
 {
+    use DisableTrait;
     use LogTrait;
 
     private const DEFAULT_LONG_JOB_IN_MINUTES = 30;
@@ -37,6 +40,7 @@ final class NotifyCommand extends Command
     public function __construct(
         private readonly QueueMonitoringService $queueMonitoringService
     ) {
+        parent::__construct();
     }
 
     /**
@@ -61,6 +65,15 @@ final class NotifyCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        if ($this->isDisabled()) {
+            $this->log(
+                'Notification were not sent because Queue Monitor is disabled.',
+                LogLevel::WARNING
+            );
+
+            return self::CODE_SUCCESS;
+        }
+
         try {
             $this->queueMonitoringService->notifyAboutLongRunningJobs(
                 (int)Configure::read(

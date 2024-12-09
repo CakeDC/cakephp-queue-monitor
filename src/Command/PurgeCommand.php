@@ -18,6 +18,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Log\LogTrait;
+use CakeDC\QueueMonitor\Core\DisableTrait;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 use Exception;
 use Psr\Log\LogLevel;
@@ -28,6 +29,7 @@ use function Cake\I18n\__;
  */
 final class PurgeCommand extends Command
 {
+    use DisableTrait;
     use LogTrait;
 
     private const DEFAULT_PURGE_DAYS_OLD = 30;
@@ -38,6 +40,7 @@ final class PurgeCommand extends Command
     public function __construct(
         private readonly QueueMonitoringService $queueMonitoringService
     ) {
+        parent::__construct();
     }
 
     /**
@@ -62,18 +65,28 @@ final class PurgeCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        if ($this->isDisabled()) {
+            $this->log(
+                'Logs were not purged because Queue Monitor is disabled.',
+                LogLevel::WARNING
+            );
+
+            return self::CODE_SUCCESS;
+        }
+        $purgeLogsOlderThanDays = (int)Configure::read(
+            'QueueMonitor.purgeLogsOlderThanDays',
+            self::DEFAULT_PURGE_DAYS_OLD
+        );
+
         $purgeToDate = $this->queueMonitoringService->getPurgeToDate(
-            (int)Configure::read(
-                'QueueMonitor.purgeLogsOlderThanDays',
-                self::DEFAULT_PURGE_DAYS_OLD
-            )
+            $purgeLogsOlderThanDays
         );
         $this->log(
             "Purging queue logs older than {$purgeToDate->toDateTimeString()} UTC",
             LogLevel::INFO
         );
         try {
-            $rowCount = $this->queueMonitoringService->purgeLogs(self::DEFAULT_PURGE_DAYS_OLD);
+            $rowCount = $this->queueMonitoringService->purgeLogs($purgeLogsOlderThanDays);
             $this->log(
                 "Purged $rowCount queue messages older than {$purgeToDate->toDateTimeString()} UTC",
                 LogLevel::INFO
