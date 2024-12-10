@@ -3,7 +3,7 @@
 ## Versions and branches
 | CakePHP |                        CakeDC Queue Monitor Plugin                         |     Tag      | Notes  |
 |:-------:|:--------------------------------------------------------------------------:|:------------:|:-------|
-|  ^5.0   | [2.0.0](https://github.com/CakeDC/cakephp-queue-monitor/tree/2.next-cake5) | 2.next-cake5 | stable |
+|  ^5.0   | [2.1.0](https://github.com/CakeDC/cakephp-queue-monitor/tree/2.next-cake5) | 2.next-cake5 | stable |
 |  ^4.4   | [1.0.0](https://github.com/CakeDC/cakephp-queue-monitor/tree/1.next-cake4) | 1.next-cake4 | stable |
 
 ## Overview
@@ -26,28 +26,14 @@ composer require cakedc/queue-monitor
 ```
 
 ## Configuration
-
-Add QueueMonitorPlugin to your `Application::bootstrap`:
-```php
-use Cake\Http\BaseApplication;
-use CakeDC\QueueMonitor\QueueMonitorPlugin;
-
-class Application extends BaseApplication
-{
-    // ...
-
-    public function bootstrap(): void
-    {
-        parent::bootstrap();
-
-        $this->addPlugin(QueueMonitorPlugin::class);
-    }
-
-    // ...
-}
-
+Add QueueMonitorPlugin to your application by running command:
+```shell
+bin/cake plugin load CakeDC/QueueMonitor
 ```
-
+Run the required migrations
+```shell
+bin/cake migrations migrate -p CakeDC/QueueMonitor
+```
 Set up the QueueMonitor configuration in your `config/app_local.php`:
 ```php
 // ...
@@ -58,26 +44,20 @@ Set up the QueueMonitor configuration in your `config/app_local.php`:
 
         // mailer config, the default is `default` mailer, you can ommit
         // this setting if you use default value
-        'mailerConfig' => 'myCustomMailer',
+        'mailerConfig' => 'default',
 
-        // the default is 30 minutes, you can ommit this setting if you
-        // use the default value
-        'longJobInMinutes' => 45,
+        // the default is 30 minutes, you can ommit this setting if you use the default value
+        'longJobInMinutes' => 30,
 
-        // the default is 30 days, you can ommit this setting if you
+        // the default is 7 days, you can ommit this setting if you use the default value
         // its advised to set this value correctly after queue usage analysis to avoid
         // high space usage in db
-        'purgeLogsOlderThanDays' => 10,
+        'purgeLogsOlderThanDays' => 7,
 
         // comma separated list of recipients of notification about long running queue jobs
         'notificationRecipients' => 'recipient1@yourdomain.com,recipient2@yourdomain.com,recipient3@yourdomain.com',
     ],
 // ...
-```
-
-Run the required migrations
-```shell
-bin/cake migrations migrate -p CakeDC/QueueMonitor
 ```
 
 For each queue configuration add `listener` setting
@@ -95,7 +75,8 @@ For each queue configuration add `listener` setting
 
 ## Notification command
 
-To set up notifications when there are long running or possible stuck jobs please use command
+To set up notifications when there are jobs running for a long time or jobs that may be stuck and blocking the queue
+please use command:
 ```shell
 bin/cake queue-monitor notify
 ```

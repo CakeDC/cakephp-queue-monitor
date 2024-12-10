@@ -32,7 +32,7 @@ final class PurgeLogsCommand extends Command
     use DisableTrait;
     use LogTrait;
 
-    private const DEFAULT_PURGE_DAYS_OLD = 30;
+    private const DEFAULT_PURGE_DAYS_OLD = 7;
 
     /**
      * Constructor
