@@ -48,7 +48,15 @@ final class NotifyCommand extends Command
      */
     public static function defaultName(): string
     {
-        return 'queue_monitor notify';
+        return 'queue-monitor notify';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getDescription(): string
+    {
+        return __('Queue Monitoring notifier');
     }
 
     /**
@@ -57,7 +65,7 @@ final class NotifyCommand extends Command
     public function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
     {
         return parent::buildOptionParser($parser)
-            ->setDescription(__('Queue Monitoring notifier'));
+            ->setDescription(self::getDescription());
     }
 
     /**
