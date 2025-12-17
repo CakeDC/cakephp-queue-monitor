@@ -17,6 +17,7 @@ use Cake\Core\BasePlugin;
 use Cake\Core\ContainerInterface;
 use CakeDC\QueueMonitor\Command\NotifyCommand;
 use CakeDC\QueueMonitor\Command\PurgeCommand;
+use CakeDC\QueueMonitor\Command\TestQueueCommand;
 use CakeDC\QueueMonitor\Service\QueueMonitoringService;
 
 /**
@@ -45,6 +46,7 @@ class QueueMonitorPlugin extends BasePlugin
     public function console(CommandCollection $commands): CommandCollection
     {
         return parent::console($commands)
+            ->add('queue-monitor test-queue', TestQueueCommand::class)
             ->add('queue_monitor purge', PurgeCommand::class)
             ->add('queue_monitor notify', NotifyCommand::class);
     }
